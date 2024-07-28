@@ -3,7 +3,7 @@ import * as express from "express";
 import * as dotenv from "dotenv";
 import { Request, Response } from "express";
 import { userRouter } from "./routes/user.routes";
-import { errorHandler } from "./handlers/error.handler";
+import { errorHandler } from "./handlers";
 import "reflect-metadata";
 dotenv.config();
 

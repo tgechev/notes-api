@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from "typeorm";
 import { Note } from "./Note";
+import { UserDTO } from "../dto";
 
 @Entity({ name: "users" })
 export class User {
@@ -14,7 +15,13 @@ export class User {
   id: string;
 
   @Column({ nullable: false })
-  fullName: string;
+  username: string;
+
+  @Column({ nullable: false })
+  firstName: string;
+
+  @Column({ nullable: false })
+  lastName: string;
 
   @Column({ nullable: false })
   email: string;
@@ -33,4 +40,15 @@ export class User {
 
   @OneToMany(() => Note, (note) => note.user)
   notes: Note[];
+
+  public toDTO(): UserDTO {
+    const userDto = new UserDTO();
+    userDto.fullName = `${this.firstName} ${this.lastName}`;
+    userDto.email = this.email;
+    userDto.id = this.id;
+    userDto.role = this.role;
+    userDto.username = this.username;
+
+    return userDto;
+  }
 }
