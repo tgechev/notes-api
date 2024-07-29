@@ -19,6 +19,7 @@ export class UserService {
     const encryptedPassword = await Encrypt.encryptPwd(userData.password);
     const names = userData.fullName.split(" ");
     const user = new User();
+    user.username = userData.username;
     user.firstName = names[0];
     user.lastName = names[1];
     user.email = userData.email;

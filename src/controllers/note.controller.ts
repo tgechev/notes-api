@@ -21,6 +21,23 @@ export class NoteController {
       });
     }
   }
+  static async getNote(req: Request, res: Response) {
+    const { id } = req.params;
+    const data = cache.get(`note:${id}`);
+    if (data) {
+      console.log("Serving cached note");
+      return res.status(200).json({
+        data,
+      });
+    } else {
+      console.log("Serving note from DB");
+      const note = await NoteService.getNote(id);
+      cache.put(`note:${id}`, note, 10000);
+      return res.status(200).json({
+        data: note,
+      });
+    }
+  }
   static async createNote(req: Request, res: Response) {
     const userId = req["currentUser"].id;
     const { title, content, tags } = req.body;
@@ -36,7 +53,7 @@ export class NoteController {
 
     note.user = currentUser;
     const savedNote = await NoteService.createNote(note);
-    return res.status(200).json({ message: "Note created.", savedNote });
+    return res.status(200).json({ id: savedNote.id });
   }
 
   static async updateNote(req: Request, res: Response) {
@@ -49,12 +66,12 @@ export class NoteController {
       content,
       tags,
     });
-    return res.status(200).json({ message: "Note updated.", updatedNote });
+    return res.status(200).json({ data: updatedNote });
   }
 
   static async deleteNote(req: Request, res: Response) {
     const { id } = req.params;
-    const deletedNote = await NoteService.deleteNote(id);
-    return res.status(200).json({ message: "Note deleted.", deletedNote });
+    await NoteService.deleteNote(id);
+    return res.status(200).json({ message: "Note deleted." });
   }
 }

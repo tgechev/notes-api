@@ -10,6 +10,11 @@ export class NoteService {
     });
   }
 
+  static async getNote(noteId: string) {
+    const noteRepository = AppDataSource.getRepository(Note);
+    return noteRepository.findOne({ where: { id: noteId } });
+  }
+
   static async createNote(note: Note) {
     const noteRepository = AppDataSource.getRepository(Note);
     return noteRepository.save(note);
@@ -22,10 +27,9 @@ export class NoteService {
     });
     note.title = noteData.title;
     note.content = noteData.content;
-    if (noteData.tags) {
-      note.tags = noteData.tags;
-    }
-    await noteRepository.save(note);
+    note.tags = noteData.tags;
+
+    return noteRepository.save(note);
   }
 
   static async deleteNote(id: string) {

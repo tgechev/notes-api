@@ -6,7 +6,7 @@ export const authorizationHandler = (roles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const userRepo = AppDataSource.getRepository(User);
     const user = await userRepo.findOne({
-      where: { id: req[" currentUser"].id },
+      where: { id: req["currentUser"].id },
     });
     console.log(user);
     if (!roles.includes(user.role)) {

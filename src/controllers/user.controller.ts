@@ -5,19 +5,16 @@ import * as cache from "memory-cache";
 
 export class UserController {
   static async register(req: Request, res: Response) {
-    const { fullName, email, password, role } = req.body;
-    const user = await UserService.createUser({
+    const { username, fullName, email, password, role } = req.body;
+    await UserService.createUser({
+      username,
       fullName,
       email,
       password,
       role,
     });
 
-    const token = Encrypt.generateToken(user.toDTO());
-
-    return res
-      .status(200)
-      .json({ message: "User created.", token, user: user.toDTO() });
+    return res.status(200).json({ message: "User created." });
   }
 
   static async getUsers(req: Request, res: Response) {

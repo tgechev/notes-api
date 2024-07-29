@@ -20,7 +20,7 @@ export class Note {
   @Column({ nullable: false })
   content: string;
 
-  @Column({ nullable: true })
+  @Column("varchar", { nullable: true, array: true })
   tags?: string[];
 
   @CreateDateColumn()
