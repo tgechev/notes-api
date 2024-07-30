@@ -14,7 +14,7 @@ export class NoteController {
     } else {
       console.log("Serving user notes from DB");
       const userId = req["currentUser"].id;
-      const notes = await NoteService.getUserNotes(userId);
+      const notes = await NoteService.getInstance().getUserNotes(userId);
       cache.put("userNotes", notes, 10000);
       return res.status(200).json({
         data: notes,
@@ -31,7 +31,7 @@ export class NoteController {
       });
     } else {
       console.log("Serving note from DB");
-      const note = await NoteService.getNote(id);
+      const note = await NoteService.getInstance().getNote(id);
       cache.put(`note:${id}`, note, 10000);
       return res.status(200).json({
         data: note,
@@ -46,13 +46,13 @@ export class NoteController {
     note.content = content;
     note.tags = tags;
 
-    const currentUser = await UserService.getUser({
+    const currentUser = await UserService.getInstance().getUser({
       where: { id: userId },
       select: { id: true },
     });
 
     note.user = currentUser;
-    const savedNote = await NoteService.createNote(note);
+    const savedNote = await NoteService.getInstance().createNote(note);
     return res.status(200).json({ id: savedNote.id });
   }
 
@@ -60,7 +60,7 @@ export class NoteController {
     const { id } = req.params;
     const { title, content, tags } = req.body;
 
-    const updatedNote = await NoteService.updateNote({
+    const updatedNote = await NoteService.getInstance().updateNote({
       id,
       title,
       content,
@@ -71,7 +71,7 @@ export class NoteController {
 
   static async deleteNote(req: Request, res: Response) {
     const { id } = req.params;
-    await NoteService.deleteNote(id);
+    await NoteService.getInstance().deleteNote(id);
     return res.status(200).json({ message: "Note deleted." });
   }
 }

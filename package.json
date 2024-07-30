@@ -31,7 +31,7 @@
   },
   "scripts": {
     "watch": "tsc -w",
-    "dev": "nodemon build/index.js",
+    "dev": "tsc && nodemon build/index.js",
     "start:dev": "concurrently \"tsc -w\" \"nodemon build/index.js\"",
     "build": "tsc",
     "start": "ts-node src/index.ts",

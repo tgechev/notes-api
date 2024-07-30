@@ -1,43 +1,54 @@
 import { AppDataSource } from "../data-source";
 import { Note } from "../entity";
 import { NoteDTO } from "../dto";
+import { Repository } from "typeorm";
 
 export class NoteService {
-  static async getUserNotes(userId: string) {
-    const noteRepository = AppDataSource.getRepository(Note);
-    return noteRepository.find({
+  private static instance: NoteService;
+  private readonly noteRepository: Repository<Note>;
+
+  constructor() {
+    this.noteRepository = AppDataSource.getRepository(Note);
+  }
+
+  static getInstance(): NoteService {
+    if (!NoteService.instance) {
+      NoteService.instance = new NoteService();
+    }
+
+    return NoteService.instance;
+  }
+
+  async getUserNotes(userId: string) {
+    return this.noteRepository.find({
       where: { user: { id: userId } },
     });
   }
 
-  static async getNote(noteId: string) {
-    const noteRepository = AppDataSource.getRepository(Note);
-    return noteRepository.findOne({ where: { id: noteId } });
+  async getNote(noteId: string) {
+    return this.noteRepository.findOne({ where: { id: noteId } });
   }
 
-  static async createNote(note: Note) {
-    const noteRepository = AppDataSource.getRepository(Note);
-    return noteRepository.save(note);
+  async createNote(note: Note) {
+    return this.noteRepository.save(note);
   }
 
-  static async updateNote(noteData: NoteDTO) {
-    const noteRepository = AppDataSource.getRepository(Note);
-    const note = await noteRepository.findOne({
+  async updateNote(noteData: NoteDTO) {
+    const note = await this.noteRepository.findOne({
       where: { id: noteData.id },
     });
     note.title = noteData.title;
     note.content = noteData.content;
     note.tags = noteData.tags;
 
-    return noteRepository.save(note);
+    return this.noteRepository.save(note);
   }
 
-  static async deleteNote(id: string) {
-    const noteRepository = AppDataSource.getRepository(Note);
-    const note = await noteRepository.findOne({
+  async deleteNote(id: string) {
+    const note = await this.noteRepository.findOne({
       where: { id },
     });
 
-    return noteRepository.remove(note);
+    return this.noteRepository.remove(note);
   }
 }

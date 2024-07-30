@@ -12,7 +12,9 @@ export class AuthController {
           .json({ message: "Username and password are required." });
       }
 
-      const user = await UserService.getUser({ where: { username } });
+      const user = await UserService.getInstance().getUser({
+        where: { username },
+      });
 
       if (!user || !Encrypt.comparePwd(user.password, password)) {
         return res
@@ -34,7 +36,7 @@ export class AuthController {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const user = await UserService.getUser({
+    const user = await UserService.getInstance().getUser({
       where: { id: req["currentUser"].id },
     });
     return res.status(200).json({ ...user.toDTO() });
