@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as cache from "memory-cache";
-import { Note } from "../entity";
-import { UserService, NoteService } from "../services";
+import { NoteService } from "../services";
+import { NoteDTO } from "../dto";
 
 export class NoteController {
   static async getUserNotes(req: Request, res: Response) {
@@ -41,19 +41,14 @@ export class NoteController {
   static async createNote(req: Request, res: Response) {
     const userId = req["currentUser"].id;
     const { title, content, tags } = req.body;
-    const note = new Note();
-    note.title = title;
-    note.content = content;
-    note.tags = tags;
+    const noteDto = new NoteDTO();
+    noteDto.title = title;
+    noteDto.content = content;
+    noteDto.tags = tags;
+    noteDto.userId = userId;
 
-    const currentUser = await UserService.getInstance().getUser({
-      where: { id: userId },
-      select: { id: true },
-    });
-
-    note.user = currentUser;
-    const savedNote = await NoteService.getInstance().createNote(note);
-    return res.status(200).json({ id: savedNote.id });
+    const noteId = await NoteService.getInstance().createNote(noteDto);
+    return res.status(200).json({ id: noteId });
   }
 
   static async updateNote(req: Request, res: Response) {

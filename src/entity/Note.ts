@@ -20,8 +20,8 @@ export class Note {
   @Column({ nullable: false })
   content: string;
 
-  @Column("varchar", { nullable: true, array: true })
-  tags?: string[];
+  @Column({ nullable: true })
+  tags: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -29,7 +29,7 @@ export class Note {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.notes)
+  @ManyToOne(() => User, (user) => user.notes, { nullable: false })
   user: User;
 
   public toDTO(): NoteDTO {
@@ -37,7 +37,7 @@ export class Note {
     noteDto.id = this.id;
     noteDto.title = this.title;
     noteDto.content = this.content;
-    noteDto.tags = this.tags;
+    noteDto.tags = this.tags.split(", ");
 
     return noteDto;
   }

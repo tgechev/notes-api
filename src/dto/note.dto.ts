@@ -4,4 +4,5 @@ export class NoteDTO {
   title?: string;
   content?: string;
   tags?: string[];
+  userId?: string;
 }

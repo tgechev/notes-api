@@ -2,6 +2,8 @@ import { AppDataSource } from "../data-source";
 import { Note } from "../entity";
 import { NoteDTO } from "../dto";
 import { Repository } from "typeorm";
+import { reduce, stringArrAcc } from "../utils";
+import { UserService } from "./UserService";
 
 export class NoteService {
   private static instance: NoteService;
@@ -29,8 +31,22 @@ export class NoteService {
     return this.noteRepository.findOne({ where: { id: noteId } });
   }
 
-  async createNote(note: Note) {
-    return this.noteRepository.save(note);
+  async createNote(noteData: NoteDTO): Promise<string> {
+    const note = new Note();
+    note.title = noteData.title;
+    note.content = noteData.content;
+    if (noteData.tags) {
+      note.tags = reduce(noteData.tags, stringArrAcc);
+    }
+
+    const currentUser = await UserService.getInstance().getUser({
+      where: { id: noteData.userId },
+      select: { id: true },
+    });
+
+    note.user = currentUser;
+    const savedNote = await this.noteRepository.save(note);
+    return savedNote.id;
   }
 
   async updateNote(noteData: NoteDTO) {
@@ -39,7 +55,9 @@ export class NoteService {
     });
     note.title = noteData.title;
     note.content = noteData.content;
-    note.tags = noteData.tags;
+    if (noteData.tags) {
+      note.tags = reduce(noteData.tags, stringArrAcc);
+    }
 
     return this.noteRepository.save(note);
   }
