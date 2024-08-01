@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { UserService } from "../services";
 import { Encrypt } from "../utils";
+import * as cache from "memory-cache";
 
 export class AuthController {
   static async login(req: Request, res: Response) {
@@ -29,6 +30,15 @@ export class AuthController {
       console.error(error);
       return res.status(500).json({ message: "Internal server error" });
     }
+  }
+  static async logout(req: Request, res: Response) {
+    const tokenExp = req["currentUser"].exp;
+    const userId = req["currentUser"].id;
+    const timeout =
+      new Date(tokenExp * 1000).getTime() - new Date().getTime();
+
+    cache.put(`logout:${userId}:${tokenExp}`, userId, timeout);
+    return res.status(200).json({ message: "User logged out." });
   }
 
   static async getUser(req: Request, res: Response) {
