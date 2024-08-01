@@ -1,7 +1,7 @@
 import { AppDataSource } from "../data-source";
 import { Note } from "../entity";
 import { NoteDTO } from "../dto";
-import { Repository } from "typeorm";
+import { Brackets, Repository } from "typeorm";
 import { reduce, stringArrAcc } from "../utils";
 import { UserService } from "./UserService";
 
@@ -22,13 +22,32 @@ export class NoteService {
   }
 
   async getUserNotes(userId: string) {
-    return this.noteRepository.find({
+    const notes = await this.noteRepository.find({
       where: { user: { id: userId } },
     });
+    return notes.map((note) => note.toDTO());
+  }
+
+  async getUserNotesByKeyword(userId: string, keyword: string) {
+    const notes = await this.noteRepository
+      .createQueryBuilder()
+      .where("Note.userId = :userId", { userId })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where("LOWER(Note.content) LIKE LOWER(:keyword)", {
+            keyword: `%${keyword}%`,
+          }).orWhere("LOWER(Note.tags) LIKE LOWER(:keyword)", {
+            keyword: `%${keyword}%`,
+          });
+        })
+      )
+      .getMany();
+    return notes.map((note) => note.toDTO());
   }
 
   async getNote(noteId: string) {
-    return this.noteRepository.findOne({ where: { id: noteId } });
+    const note = await this.noteRepository.findOne({ where: { id: noteId } });
+    return note ? note.toDTO() : null;
   }
 
   async createNote(noteData: NoteDTO): Promise<string> {
@@ -59,7 +78,8 @@ export class NoteService {
       note.tags = reduce(noteData.tags, stringArrAcc);
     }
 
-    return this.noteRepository.save(note);
+    await this.noteRepository.save(note);
+    return noteData;
   }
 
   async deleteNote(id: string) {

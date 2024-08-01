@@ -26,12 +26,14 @@ Router.get(
 Router.post("/register", UserController.register);
 Router.post("/login", AuthController.login);
 Router.post("/logout", authenticationHandler, AuthController.logout);
+
 Router.put(
   "/update/:id",
   authenticationHandler,
   authorizationHandler(["user", "admin"]),
   UserController.updateUser
 );
+
 Router.delete(
   "/delete/:id",
   authenticationHandler,

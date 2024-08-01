@@ -21,6 +21,19 @@ export class NoteController {
       });
     }
   }
+
+  static async searchUserNotes(req: Request, res: Response) {
+    const { q } = req.query;
+    const userId = req["currentUser"].id;
+    const notes = await NoteService.getInstance().getUserNotesByKeyword(
+      userId,
+      q.toString()
+    );
+    return res.status(200).json({
+      data: notes,
+    });
+  }
+
   static async getNote(req: Request, res: Response) {
     const { id } = req.params;
     const data = cache.get(`note:${id}`);
@@ -32,12 +45,19 @@ export class NoteController {
     } else {
       console.log("Serving note from DB");
       const note = await NoteService.getInstance().getNote(id);
-      cache.put(`note:${id}`, note, 10000);
-      return res.status(200).json({
-        data: note,
-      });
+      if (note) {
+        cache.put(`note:${id}`, note, 10000);
+        return res.status(200).json({
+          data: note,
+        });
+      } else {
+        return res.status(404).json({
+          message: "Note not found.",
+        });
+      }
     }
   }
+
   static async createNote(req: Request, res: Response) {
     const userId = req["currentUser"].id;
     const { title, content, tags } = req.body;
