@@ -3,14 +3,33 @@ import { authenticationHandler, authorizationHandler } from "../handlers";
 import { AuthController, UserController } from "../controllers";
 const Router = express.Router();
 
+/**
+ * @openapi
+ * /user/all:
+ *   get:
+ *     tags:
+ *      - Users
+ *     summary: Returns information about all users.
+ *     description: Returns information about all registered users. A valid JWT token and admin priviliges are required.
+ */
 Router.get(
-  "/users",
+  "/all",
   authenticationHandler,
   authorizationHandler(["admin"]),
   UserController.getUsers
 );
+
+/**
+ * @openapi
+ * /user:
+ *   get:
+ *     tags:
+ *      - Users
+ *     summary: Returns information about a logged in user.
+ *     description: Returns information about the logged in user. A valid JWT token is required.
+ */
 Router.get(
-  "/user",
+  "/",
   authenticationHandler,
   authorizationHandler(["user", "admin"]),
   AuthController.getUser
@@ -18,24 +37,31 @@ Router.get(
 
 /**
  * @openapi
- * /auth/register:
- *   post:
- *     summary: Register a user
- *     description: Register a user in the system. As a minimum username and password should be provided for a successful registration.
+ * /user/:id:
+ *   put:
+ *     tags:
+ *      - Users
+ *     summary: Updates a user by their id.
+ *     description: Only admin users can update users by id. A valid JWT token is required.
  */
-Router.post("/register", UserController.register);
-Router.post("/login", AuthController.login);
-Router.post("/logout", authenticationHandler, AuthController.logout);
-
 Router.put(
-  "/update/:id",
+  "/:id",
   authenticationHandler,
-  authorizationHandler(["user", "admin"]),
+  authorizationHandler(["admin"]),
   UserController.updateUser
 );
 
+/**
+ * @openapi
+ * /user/:id:
+ *   delete:
+ *     tags:
+ *      - Users
+ *     summary: Deletes a user by their id.
+ *     description: Only admin users can delete users by id. A valid JWT token is required.
+ */
 Router.delete(
-  "/delete/:id",
+  "/:id",
   authenticationHandler,
   authorizationHandler(["admin"]),
   UserController.deleteUser

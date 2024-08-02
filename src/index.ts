@@ -5,7 +5,7 @@ import * as dotenv from "dotenv";
 import * as swaggerJSDoc from "swagger-jsdoc";
 import * as swaggerUI from "swagger-ui-express";
 import { AppDataSource } from "./data-source";
-import { userRouter, noteRouter } from "./routes";
+import { userRouter, noteRouter, authRouter } from "./routes";
 import { errorHandler } from "./handlers";
 import "reflect-metadata";
 dotenv.config();
@@ -38,7 +38,8 @@ app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(spec));
 app.use(express.json());
 app.use(errorHandler);
 const { PORT = 3000 } = process.env;
-app.use("/auth", userRouter);
+app.use("/auth", authRouter);
+app.use("/user", userRouter);
 app.use("/notes", noteRouter);
 
 app.get("/", (req: Request, res: Response) => {
