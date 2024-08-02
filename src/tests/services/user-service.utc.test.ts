@@ -6,7 +6,7 @@ import { InternalServerError, UserExistsError } from "../../errors";
 import { mock } from "jest-mock-extended";
 import { Encrypt } from "../../utils";
 
-const testUserId = "ce6dbf14-f5d8-4de0-95c9-25a76724248a";
+const testId = "ce6dbf14-f5d8-4de0-95c9-25a76724248a";
 const testUser: Partial<User> = {
   firstName: "Test",
   lastName: "User",
@@ -37,7 +37,7 @@ describe("UserService", () => {
 
   describe("getUser", () => {
     it("should return user", async () => {
-      const testUser = await service.getUser({ where: { id: testUserId } });
+      const testUser = await service.getUser({ where: { id: testId } });
 
       expect(testUser).toEqual(testUser);
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
@@ -48,7 +48,7 @@ describe("UserService", () => {
       repoSpy.findOne.mockRejectedValueOnce(new Error("Server error"));
 
       await expect(
-        service.getUser({ where: { id: testUserId } })
+        service.getUser({ where: { id: testId } })
       ).rejects.toThrow(new InternalServerError());
       expect(errorSpy).toHaveBeenCalledTimes(1);
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
@@ -124,7 +124,7 @@ describe("UserService", () => {
 
   describe("updateUser", () => {
     it("should update user", async () => {
-      testUserDto.id = testUserId;
+      testUserDto.id = testId;
       repoSpy.findOne.mockResolvedValueOnce(testUser as User);
       repoSpy.save.mockResolvedValueOnce(testUser as User);
       const updatedUser = await service.updateUser(testUserDto);
@@ -134,7 +134,7 @@ describe("UserService", () => {
       expect(repoSpy.save).toHaveBeenCalledTimes(1);
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
       expect(repoSpy.findOne).toHaveBeenCalledWith({
-        where: { id: testUserId },
+        where: { id: testId },
       });
       expect(errorSpy).toHaveBeenCalledTimes(0);
     });
@@ -155,7 +155,7 @@ describe("UserService", () => {
       expect(errorSpy).toHaveBeenCalledTimes(1);
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
       expect(repoSpy.findOne).toHaveBeenCalledWith({
-        where: { id: testUserId },
+        where: { id: testId },
       });
       expect(repoSpy.save).toHaveBeenCalledTimes(1);
       expect(repoSpy.save).toHaveBeenCalledWith(testUser);
@@ -166,14 +166,14 @@ describe("UserService", () => {
     it("should delete user", async () => {
       repoSpy.findOne.mockResolvedValueOnce(testUser as User);
       repoSpy.remove.mockResolvedValueOnce(testUser as User);
-      const deletedUser = await service.deleteUser(testUserId);
+      const deletedUser = await service.deleteUser(testId);
 
       expect(deletedUser).toEqual(testUser);
       expect(repoSpy.remove).toHaveBeenCalledWith(testUser);
       expect(repoSpy.remove).toHaveBeenCalledTimes(1);
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
       expect(repoSpy.findOne).toHaveBeenCalledWith({
-        where: { id: testUserId },
+        where: { id: testId },
       });
       expect(errorSpy).toHaveBeenCalledTimes(0);
     });
@@ -188,13 +188,13 @@ describe("UserService", () => {
         )
       );
 
-      await expect(service.deleteUser(testUserId)).rejects.toThrow(
+      await expect(service.deleteUser(testId)).rejects.toThrow(
         new InternalServerError()
       );
       expect(errorSpy).toHaveBeenCalledTimes(1);
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
       expect(repoSpy.findOne).toHaveBeenCalledWith({
-        where: { id: testUserId },
+        where: { id: testId },
       });
       expect(repoSpy.remove).toHaveBeenCalledTimes(1);
       expect(repoSpy.remove).toHaveBeenCalledWith(testUser);
