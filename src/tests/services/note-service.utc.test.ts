@@ -95,20 +95,24 @@ describe("NoteService", () => {
 
   describe("getNote", () => {
     it("should retrieve note", async () => {
-      const note = await service.getNote(testId);
+      const note = await service.getNote(testNote.toDTO());
 
       expect(note).toEqual(testNote.toDTO());
-      expect(repoSpy.findOne).toHaveBeenCalledWith({ where: { id: testId } });
+      expect(repoSpy.findOne).toHaveBeenCalledWith({
+        where: { id: testId, user: { id: testId } },
+      });
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
       expect(errorSpy).toHaveBeenCalledTimes(0);
     });
 
     it("should return null if note not found", async () => {
       repoSpy.findOne.mockResolvedValueOnce(null);
-      const note = await service.getNote(testId);
+      const note = await service.getNote(testNote.toDTO());
 
       expect(note).toEqual(null);
-      expect(repoSpy.findOne).toHaveBeenCalledWith({ where: { id: testId } });
+      expect(repoSpy.findOne).toHaveBeenCalledWith({
+        where: { id: testId, user: { id: testId } },
+      });
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
       expect(errorSpy).toHaveBeenCalledTimes(0);
     });
@@ -122,11 +126,13 @@ describe("NoteService", () => {
         )
       );
 
-      await expect(service.getNote(testId)).rejects.toThrow(
+      await expect(service.getNote(testNote.toDTO())).rejects.toThrow(
         new InternalServerError()
       );
       expect(errorSpy).toHaveBeenCalledTimes(1);
-      expect(repoSpy.findOne).toHaveBeenCalledWith({ where: { id: testId } });
+      expect(repoSpy.findOne).toHaveBeenCalledWith({
+        where: { id: testId, user: { id: testId } },
+      });
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
     });
   });
@@ -186,7 +192,9 @@ describe("NoteService", () => {
       expect(repoSpy.save).toHaveBeenCalledTimes(1);
       expect(errorSpy).toHaveBeenCalledTimes(0);
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
-      expect(repoSpy.findOne).toHaveBeenCalledWith({ where: { id: testId } });
+      expect(repoSpy.findOne).toHaveBeenCalledWith({
+        where: { id: testId, user: { id: testId } },
+      });
     });
 
     it("should throw server error", async () => {
@@ -205,21 +213,25 @@ describe("NoteService", () => {
       expect(repoSpy.save).toHaveBeenCalledTimes(1);
       expect(repoSpy.save).toHaveBeenCalledWith(testNote);
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
-      expect(repoSpy.findOne).toHaveBeenCalledWith({ where: { id: testId } });
+      expect(repoSpy.findOne).toHaveBeenCalledWith({
+        where: { id: testId, user: { id: testId } },
+      });
     });
   });
 
   describe("deleteNote", () => {
     it("should delete note", async () => {
       repoSpy.remove.mockResolvedValueOnce(testNote);
-      const deletedNote = await service.deleteNote(testId);
+      const deletedNote = await service.deleteNote(testNote.toDTO());
 
       expect(deletedNote).toEqual(testNote);
       expect(repoSpy.remove).toHaveBeenCalledWith(testNote);
       expect(repoSpy.remove).toHaveBeenCalledTimes(1);
       expect(errorSpy).toHaveBeenCalledTimes(0);
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
-      expect(repoSpy.findOne).toHaveBeenCalledWith({ where: { id: testId } });
+      expect(repoSpy.findOne).toHaveBeenCalledWith({
+        where: { id: testId, user: { id: testId } },
+      });
     });
 
     it("should throw server error", async () => {
@@ -231,14 +243,16 @@ describe("NoteService", () => {
         )
       );
 
-      await expect(service.deleteNote(testId)).rejects.toThrow(
+      await expect(service.deleteNote(testNote.toDTO())).rejects.toThrow(
         new InternalServerError()
       );
       expect(errorSpy).toHaveBeenCalledTimes(1);
       expect(repoSpy.remove).toHaveBeenCalledTimes(1);
       expect(repoSpy.remove).toHaveBeenCalledWith(testNote);
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
-      expect(repoSpy.findOne).toHaveBeenCalledWith({ where: { id: testId } });
+      expect(repoSpy.findOne).toHaveBeenCalledWith({
+        where: { id: testId, user: { id: testId } },
+      });
     });
   });
 });

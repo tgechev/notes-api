@@ -43,6 +43,7 @@ export class NoteController {
   }
 
   static async getNote(req: Request, res: Response) {
+    const userId = req["currentUser"].id;
     const { id } = req.params;
     const data = cache.get(`note:${id}`);
     if (data) {
@@ -53,7 +54,7 @@ export class NoteController {
     } else {
       console.log("Serving note from DB");
       try {
-        const note = await NoteService.getInstance().getNote(id);
+        const note = await NoteService.getInstance().getNote({ id, userId });
         if (note) {
           cache.put(`note:${id}`, note, 10000);
           return res.status(200).json({
@@ -88,6 +89,7 @@ export class NoteController {
   }
 
   static async updateNote(req: Request, res: Response) {
+    const userId = req["currentUser"].id;
     const { id } = req.params;
     const { title, content, tags } = req.body;
 
@@ -97,6 +99,7 @@ export class NoteController {
         title,
         content,
         tags,
+        userId,
       });
       return res.status(200).json({ data: updatedNote });
     } catch (error) {
@@ -105,9 +108,10 @@ export class NoteController {
   }
 
   static async deleteNote(req: Request, res: Response) {
+    const userId = req["currentUser"].id;
     const { id } = req.params;
     try {
-      await NoteService.getInstance().deleteNote(id);
+      await NoteService.getInstance().deleteNote({ id, userId });
       return res.status(200).json({ message: "Note deleted." });
     } catch (error) {
       return res.status(500).json({ message: "Could not delete note." });

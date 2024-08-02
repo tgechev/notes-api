@@ -56,9 +56,11 @@ export class NoteService {
     }
   }
 
-  async getNote(noteId: string) {
+  async getNote(noteData: NoteDTO) {
     try {
-      const note = await this.noteRepository.findOne({ where: { id: noteId } });
+      const note = await this.noteRepository.findOne({
+        where: { id: noteData.id, user: { id: noteData.userId } },
+      });
       return note ? note.toDTO() : null;
     } catch (error: unknown) {
       console.error(error);
@@ -92,7 +94,7 @@ export class NoteService {
   async updateNote(noteData: NoteDTO) {
     try {
       const note = await this.noteRepository.findOne({
-        where: { id: noteData.id },
+        where: { id: noteData.id, user: { id: noteData.userId } },
       });
       note.title = noteData.title;
       note.content = noteData.content;
@@ -108,10 +110,10 @@ export class NoteService {
     }
   }
 
-  async deleteNote(id: string) {
+  async deleteNote(noteData: NoteDTO) {
     try {
       const note = await this.noteRepository.findOne({
-        where: { id },
+        where: { id: noteData.id, user: { id: noteData.userId } },
       });
 
       return await this.noteRepository.remove(note);
