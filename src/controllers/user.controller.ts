@@ -34,30 +34,40 @@ export class UserController {
       });
     } else {
       console.log("Serving users from DB");
-      const users = await UserService.getInstance().getUsers();
-
-      cache.put("users", users, 6000);
-      return res.status(200).json({
-        data: users,
-      });
+      try {
+        const users = await UserService.getInstance().getUsers();
+        cache.put("users", users, 6000);
+        return res.status(200).json({
+          data: users,
+        });
+      } catch (error) {
+        return res.status(500).json({ message: "Could not retrieve users." });
+      }
     }
   }
 
   static async updateUser(req: Request, res: Response) {
     const { id } = req.params;
     const { fullName, email } = req.body;
-    const updatedUser = await UserService.getInstance().updateUser({
-      id,
-      fullName,
-      email,
-    });
-
-    res.status(200).json({ message: "update", user: updatedUser.toDTO() });
+    try {
+      const updatedUser = await UserService.getInstance().updateUser({
+        id,
+        fullName,
+        email,
+      });
+      res.status(200).json({ message: "update", user: updatedUser.toDTO() });
+    } catch (error) {
+      return res.status(500).json({ message: "Could not update user." });
+    }
   }
 
   static async deleteUser(req: Request, res: Response) {
     const { id } = req.params;
-    await UserService.getInstance().deleteUser(id);
-    res.status(200).json({ message: "ok" });
+    try {
+      await UserService.getInstance().deleteUser(id);
+      res.status(200).json({ message: "ok" });
+    } catch (error) {
+      return res.status(500).json({ message: "Could not delete user." });
+    }
   }
 }

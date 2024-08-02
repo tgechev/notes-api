@@ -22,11 +22,21 @@ export class UserService {
   }
 
   async getUser(options: FindOneOptions<User>) {
-    return this.userRepository.findOne(options);
+    try {
+      return await this.userRepository.findOne(options);
+    } catch (error: unknown) {
+      console.error(error);
+      throw new InternalServerError();
+    }
   }
 
   async getUsers() {
-    return this.userRepository.find();
+    try {
+      return await this.userRepository.find();
+    } catch (error: unknown) {
+      console.error(error);
+      throw new InternalServerError();
+    }
   }
 
   async createUser(userData: UserDTO) {
@@ -56,24 +66,34 @@ export class UserService {
   }
 
   async updateUser(userData: UserDTO) {
-    const user = await this.userRepository.findOne({
-      where: { id: userData.id },
-    });
-    if (userData.fullName) {
-      const names = userData.fullName.split(" ");
-      user.firstName = names[0];
-      user.lastName = names[1];
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: userData.id },
+      });
+      if (userData.fullName) {
+        const names = userData.fullName.split(" ");
+        user.firstName = names[0];
+        user.lastName = names[1];
+      }
+      if (userData.email) {
+        user.email = userData.email;
+      }
+      return await this.userRepository.save(user);
+    } catch (error: unknown) {
+      console.error(error);
+      throw new InternalServerError();
     }
-    if (userData.email) {
-      user.email = userData.email;
-    }
-    return this.userRepository.save(user);
   }
 
   async deleteUser(userId: string) {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-    });
-    return this.userRepository.remove(user);
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+      return await this.userRepository.remove(user);
+    } catch (error: unknown) {
+      console.error(error);
+      throw new InternalServerError();
+    }
   }
 }

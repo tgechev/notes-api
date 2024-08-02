@@ -14,24 +14,32 @@ export class NoteController {
     } else {
       console.log("Serving user notes from DB");
       const userId = req["currentUser"].id;
-      const notes = await NoteService.getInstance().getUserNotes(userId);
-      cache.put("userNotes", notes, 10000);
-      return res.status(200).json({
-        data: notes,
-      });
+      try {
+        const notes = await NoteService.getInstance().getUserNotes(userId);
+        cache.put("userNotes", notes, 10000);
+        return res.status(200).json({
+          data: notes,
+        });
+      } catch (error) {
+        return res.status(500).json({ message: "Could not get user notes." });
+      }
     }
   }
 
   static async searchUserNotes(req: Request, res: Response) {
     const { q } = req.query;
     const userId = req["currentUser"].id;
-    const notes = await NoteService.getInstance().getUserNotesByKeyword(
-      userId,
-      q.toString()
-    );
-    return res.status(200).json({
-      data: notes,
-    });
+    try {
+      const notes = await NoteService.getInstance().getUserNotesByKeyword(
+        userId,
+        q.toString()
+      );
+      return res.status(200).json({
+        data: notes,
+      });
+    } catch (error) {
+      return res.status(500).json({ message: "Could not search notes." });
+    }
   }
 
   static async getNote(req: Request, res: Response) {
@@ -44,16 +52,20 @@ export class NoteController {
       });
     } else {
       console.log("Serving note from DB");
-      const note = await NoteService.getInstance().getNote(id);
-      if (note) {
-        cache.put(`note:${id}`, note, 10000);
-        return res.status(200).json({
-          data: note,
-        });
-      } else {
-        return res.status(404).json({
-          message: "Note not found.",
-        });
+      try {
+        const note = await NoteService.getInstance().getNote(id);
+        if (note) {
+          cache.put(`note:${id}`, note, 10000);
+          return res.status(200).json({
+            data: note,
+          });
+        } else {
+          return res.status(404).json({
+            message: "Note not found.",
+          });
+        }
+      } catch (error) {
+        return res.status(500).json({ message: "Could not retrieve note." });
       }
     }
   }
@@ -67,26 +79,38 @@ export class NoteController {
     noteDto.tags = tags;
     noteDto.userId = userId;
 
-    const noteId = await NoteService.getInstance().createNote(noteDto);
-    return res.status(200).json({ id: noteId });
+    try {
+      const noteId = await NoteService.getInstance().createNote(noteDto);
+      return res.status(200).json({ id: noteId });
+    } catch (error) {
+      return res.status(500).json({ message: "Could not create note." });
+    }
   }
 
   static async updateNote(req: Request, res: Response) {
     const { id } = req.params;
     const { title, content, tags } = req.body;
 
-    const updatedNote = await NoteService.getInstance().updateNote({
-      id,
-      title,
-      content,
-      tags,
-    });
-    return res.status(200).json({ data: updatedNote });
+    try {
+      const updatedNote = await NoteService.getInstance().updateNote({
+        id,
+        title,
+        content,
+        tags,
+      });
+      return res.status(200).json({ data: updatedNote });
+    } catch (error) {
+      return res.status(500).json({ message: "Could not update note." });
+    }
   }
 
   static async deleteNote(req: Request, res: Response) {
     const { id } = req.params;
-    await NoteService.getInstance().deleteNote(id);
-    return res.status(200).json({ message: "Note deleted." });
+    try {
+      await NoteService.getInstance().deleteNote(id);
+      return res.status(200).json({ message: "Note deleted." });
+    } catch (error) {
+      return res.status(500).json({ message: "Could not delete note." });
+    }
   }
 }
