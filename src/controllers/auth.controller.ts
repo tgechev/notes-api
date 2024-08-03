@@ -23,7 +23,7 @@ export class AuthController {
           .json({ message: "Invalid username or password." });
       }
 
-      const token = Encrypt.generateToken(user.toDTO());
+      const token = Encrypt.generateToken({ ...user.toDTO() });
 
       return res.status(200).json({ token });
     } catch (error) {
