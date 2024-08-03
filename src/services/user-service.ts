@@ -32,7 +32,8 @@ export class UserService {
 
   async getUsers() {
     try {
-      return await this.userRepository.find();
+      const users = await this.userRepository.find();
+      return users.map((user) => user.toDTO());
     } catch (error: unknown) {
       console.error(error);
       throw new InternalServerError();

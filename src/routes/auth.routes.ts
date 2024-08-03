@@ -22,6 +22,26 @@ const Router = express.Router();
  *                 message:
  *                   type: string
  *                   example: User created.
+ *       400:
+ *         description: Error response for missing username or password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Username and password are required.
+ *       409:
+ *         description: Error response for an existing user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Username or email already exists.
  *       500:
  *         description: Error response for unsuccessfully created user.
  *         content:
@@ -43,6 +63,39 @@ Router.post("/register", UserController.register);
  *      - Auth
  *     summary: Login a user
  *     description: Logs in a user. Username and password are required for a successful login.
+ *     responses:
+ *       200:
+ *         description: Successfully logged in user response.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmdWxsTmFtZSI6IlRyZW5kYWZpbCBHZWNoZXYiLCJlbWFpbCI6InRyZW5kYWZpbC4xOTk3QGdtYWlsLmNvbSIsImlkIjoiYjRiNDdmODQtZGY0YS00YTc4LTkxMjQtNTMxNTBjZTg4YWY5Iiwicm9sZSI6InVzZXIiLCJ1c2VybmFtZSI6InRnZWNoZXYiLCJpYXQiOjE3MjI3MDA1OTUsImV4cCI6MTcyMjcyOTM5NX0.TE_mCrMkalFmC6BidQgcPTE-GY8Wdd3a_iXfmMg29Dg
+ *       400:
+ *         description: Error response for missing/invalid username or password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   examples:
+ *                     - Username and password are required.
+ *                     - Invalid username or password.
+ *       500:
+ *         description: Server error response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
  */
 Router.post("/login", AuthController.login);
 
@@ -54,6 +107,27 @@ Router.post("/login", AuthController.login);
  *      - Auth
  *     summary: Logs out a user.
  *     description: Logs out a user. A valid JWT token is required.
+ *     responses:
+ *       200:
+ *         description: Successfully logged out user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User logged out.
+ *       401:
+ *         description: Unauthorized response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
  */
 Router.post("/logout", authenticationHandler, AuthController.logout);
 export { Router as authRouter };

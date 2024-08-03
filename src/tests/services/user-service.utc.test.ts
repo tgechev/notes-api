@@ -7,19 +7,14 @@ import { mock } from "jest-mock-extended";
 import { Encrypt } from "../../utils";
 
 const testId = "ce6dbf14-f5d8-4de0-95c9-25a76724248a";
-const testUser: Partial<User> = {
-  firstName: "Test",
-  lastName: "User",
-  password: "test-encrypted-pwd",
-  username: "test.user",
-  email: "test.user@fastdev.se",
-  role: "user",
-};
-const testUserDto = {
-  ...testUser,
-  password: "test-pwd",
-  fullName: `${testUser.firstName} ${testUser.lastName}`,
-};
+const testUser = new User();
+testUser.id = testId;
+testUser.firstName = "Test";
+testUser.lastName = "User";
+testUser.password = "test-encrypted-pwd";
+testUser.username = "test.user";
+testUser.email = "test.user@fastdev.se";
+testUser.role = "user";
 
 const errorSpy = jest.spyOn(console, "error");
 const encryptPwdSpy = jest
@@ -77,15 +72,17 @@ describe("UserService", () => {
 
   describe("createUser", () => {
     it("should create user", async () => {
+      const { id: userId, ...userToSave } = testUser;
       repoSpy.save.mockResolvedValueOnce(testUser as User);
-      await service.createUser(testUserDto);
-      expect(repoSpy.save).toHaveBeenCalledWith(testUser);
+      await service.createUser(testUser.toDTO());
+      expect(repoSpy.save).toHaveBeenCalledWith(userToSave);
       expect(repoSpy.save).toHaveBeenCalledTimes(1);
       expect(encryptPwdSpy).toHaveBeenCalledTimes(1);
       expect(errorSpy).toHaveBeenCalledTimes(0);
     });
 
     it("should throw already exists error", async () => {
+      const { id: userId, ...userToSave } = testUser;
       repoSpy.save.mockRejectedValueOnce(
         new QueryFailedError(
           "test-create-query",
@@ -94,16 +91,17 @@ describe("UserService", () => {
         )
       );
 
-      await expect(service.createUser(testUserDto)).rejects.toThrow(
+      await expect(service.createUser(testUser.toDTO())).rejects.toThrow(
         new UserExistsError()
       );
       expect(errorSpy).toHaveBeenCalledTimes(0);
-      expect(repoSpy.save).toHaveBeenCalledWith(testUser);
+      expect(repoSpy.save).toHaveBeenCalledWith(userToSave);
       expect(repoSpy.save).toHaveBeenCalledTimes(1);
       expect(encryptPwdSpy).toHaveBeenCalledTimes(1);
     });
 
     it("should throw server error", async () => {
+      const { id: userId, ...userToSave } = testUser;
       repoSpy.save.mockRejectedValueOnce(
         new QueryFailedError(
           "test-create-query",
@@ -112,11 +110,11 @@ describe("UserService", () => {
         )
       );
 
-      await expect(service.createUser(testUserDto)).rejects.toThrow(
+      await expect(service.createUser(testUser.toDTO())).rejects.toThrow(
         new InternalServerError()
       );
       expect(errorSpy).toHaveBeenCalledTimes(1);
-      expect(repoSpy.save).toHaveBeenCalledWith(testUser);
+      expect(repoSpy.save).toHaveBeenCalledWith(userToSave);
       expect(repoSpy.save).toHaveBeenCalledTimes(1);
       expect(encryptPwdSpy).toHaveBeenCalledTimes(1);
     });
@@ -124,10 +122,9 @@ describe("UserService", () => {
 
   describe("updateUser", () => {
     it("should update user", async () => {
-      testUserDto.id = testId;
       repoSpy.findOne.mockResolvedValueOnce(testUser as User);
       repoSpy.save.mockResolvedValueOnce(testUser as User);
-      const updatedUser = await service.updateUser(testUserDto);
+      const updatedUser = await service.updateUser(testUser.toDTO());
 
       expect(updatedUser).toEqual(testUser);
       expect(repoSpy.save).toHaveBeenCalledWith(testUser);
@@ -149,7 +146,7 @@ describe("UserService", () => {
         )
       );
 
-      await expect(service.updateUser(testUserDto)).rejects.toThrow(
+      await expect(service.updateUser(testUser.toDTO())).rejects.toThrow(
         new InternalServerError()
       );
       expect(errorSpy).toHaveBeenCalledTimes(1);
