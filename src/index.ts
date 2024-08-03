@@ -23,6 +23,15 @@ const specOptions: swaggerJSDoc.OAS3Options = {
         email: "trendafil.1997@gmail.com",
       },
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
     servers: [
       { url: "http://localhost:3000", description: "Development server" },
     ],

@@ -11,6 +11,28 @@ const Router = express.Router();
  *      - Auth
  *     summary: Register a user
  *     description: Register a user in the system. As a minimum username and password should be provided for a successful registration.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *            type: object
+ *            properties:
+ *              username:
+ *                type: string
+ *                example: test.user
+ *              password:
+ *                type: string
+ *                example: test.user.password
+ *              email:
+ *                type: string
+ *                example: test.user@fastdev.se
+ *              fullName:
+ *                type: string
+ *                example: Test User
+ *              role:
+ *                type: string
+ *                example: user
  *     responses:
  *       200:
  *         description: Successfully created user response.
@@ -63,6 +85,19 @@ Router.post("/register", UserController.register);
  *      - Auth
  *     summary: Login a user
  *     description: Logs in a user. Username and password are required for a successful login.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *            type: object
+ *            properties:
+ *              username:
+ *                type: string
+ *                example: test.user
+ *              password:
+ *                type: string
+ *                example: test.user.password
  *     responses:
  *       200:
  *         description: Successfully logged in user response.
@@ -103,6 +138,8 @@ Router.post("/login", AuthController.login);
  * @openapi
  * /auth/logout:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     tags:
  *      - Auth
  *     summary: Logs out a user.
