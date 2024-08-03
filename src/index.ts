@@ -54,3 +54,5 @@ AppDataSource.initialize()
     console.log("Data connection initialized.");
   })
   .catch((error) => console.log(error));
+
+export default app;

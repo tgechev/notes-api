@@ -20,10 +20,11 @@ testNote.user = testUser;
 const errorSpy = jest.spyOn(console, "error");
 const repoSpy = mock<Repository<Note>>();
 const qbSpy = mock<SelectQueryBuilder<Note>>();
-const userServiceSpy = mock<UserService>();
-jest.spyOn(AppDataSource, "getRepository").mockReturnValue(repoSpy);
+
 jest.mock("../../services/user-service");
+const userServiceSpy = mock<UserService>();
 UserService.getInstance = () => userServiceSpy;
+jest.spyOn(AppDataSource, "getRepository").mockReturnValue(repoSpy);
 
 describe("NoteService", () => {
   let service: NoteService;

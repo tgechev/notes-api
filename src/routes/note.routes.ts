@@ -17,17 +17,6 @@ Router.get("/", authenticationHandler, NoteController.getUserNotes);
 
 /**
  * @openapi
- * /notes/:id:
- *   get:
- *     tags:
- *      - Notes
- *     summary: Returns a user note by id
- *     description: Returns a note belonging to the logged in user using the provided id. A valid JWT token is required.
- */
-Router.get("/:id", authenticationHandler, NoteController.getNote);
-
-/**
- * @openapi
  * /notes/search:
  *   get:
  *     tags:
@@ -36,6 +25,17 @@ Router.get("/:id", authenticationHandler, NoteController.getNote);
  *     description: Returns a list of user notes whose content and tags contain the provided keyword. A valid JWT token is required.
  */
 Router.get("/search", authenticationHandler, NoteController.searchUserNotes);
+
+/**
+ * @openapi
+ * /notes/:id:
+ *   get:
+ *     tags:
+ *      - Notes
+ *     summary: Returns a user note by id
+ *     description: Returns a note belonging to the logged in user using the provided id. A valid JWT token is required.
+ */
+Router.get("/:id", authenticationHandler, NoteController.getNote);
 
 /**
  * @openapi

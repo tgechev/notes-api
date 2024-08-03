@@ -38,7 +38,9 @@ export class Note {
     noteDto.title = this.title;
     noteDto.content = this.content;
     noteDto.tags = this.tags.split(", ");
-    noteDto.userId = this.user.id;
+    if (this.user) {
+      noteDto.userId = this.user.id;
+    }
 
     return noteDto;
   }

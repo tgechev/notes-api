@@ -11,6 +11,27 @@ const Router = express.Router();
  *      - Auth
  *     summary: Register a user
  *     description: Register a user in the system. As a minimum username and password should be provided for a successful registration.
+ *     responses:
+ *       200:
+ *         description: Successfully created user response.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User created.
+ *       500:
+ *         description: Error response for unsuccessfully created user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Could not create user.
  */
 Router.post("/register", UserController.register);
 

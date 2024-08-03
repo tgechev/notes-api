@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import * as cache from "memory-cache";
 import { NoteService } from "../services";
 import { NoteDTO } from "../dto";
+import { ApiRespBody } from "./api.response-body";
 
 export class NoteController {
-  static async getUserNotes(req: Request, res: Response) {
+  static async getUserNotes(req: Request, res: Response<ApiRespBody>) {
     const data = cache.get("userNotes");
     if (data) {
       console.log("Serving cached user notes");
@@ -26,7 +27,7 @@ export class NoteController {
     }
   }
 
-  static async searchUserNotes(req: Request, res: Response) {
+  static async searchUserNotes(req: Request, res: Response<ApiRespBody>) {
     const { q } = req.query;
     const userId = req["currentUser"].id;
     try {
@@ -42,7 +43,7 @@ export class NoteController {
     }
   }
 
-  static async getNote(req: Request, res: Response) {
+  static async getNote(req: Request, res: Response<ApiRespBody>) {
     const userId = req["currentUser"].id;
     const { id } = req.params;
     const data = cache.get(`note:${id}`);
@@ -71,7 +72,7 @@ export class NoteController {
     }
   }
 
-  static async createNote(req: Request, res: Response) {
+  static async createNote(req: Request, res: Response<ApiRespBody>) {
     const userId = req["currentUser"].id;
     const { title, content, tags } = req.body;
     const noteDto = new NoteDTO();
@@ -82,13 +83,13 @@ export class NoteController {
 
     try {
       const noteId = await NoteService.getInstance().createNote(noteDto);
-      return res.status(200).json({ id: noteId });
+      return res.status(200).json({ data: { id: noteId } });
     } catch (error) {
       return res.status(500).json({ message: "Could not create note." });
     }
   }
 
-  static async updateNote(req: Request, res: Response) {
+  static async updateNote(req: Request, res: Response<ApiRespBody>) {
     const userId = req["currentUser"].id;
     const { id } = req.params;
     const { title, content, tags } = req.body;
@@ -107,7 +108,7 @@ export class NoteController {
     }
   }
 
-  static async deleteNote(req: Request, res: Response) {
+  static async deleteNote(req: Request, res: Response<ApiRespBody>) {
     const userId = req["currentUser"].id;
     const { id } = req.params;
     try {
