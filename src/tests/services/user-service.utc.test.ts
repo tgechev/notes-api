@@ -47,9 +47,9 @@ describe("UserService", () => {
     it("should throw and log error", async () => {
       repoSpy.findOne.mockRejectedValueOnce(new Error("Server error"));
 
-      await expect(
-        service.getUser({ where: { id: testId } })
-      ).rejects.toThrow(new InternalServerError());
+      await expect(service.getUser({ where: { id: testId } })).rejects.toThrow(
+        new InternalServerError()
+      );
       expect(errorSpy).toHaveBeenCalledTimes(1);
       expect(repoSpy.findOne).toHaveBeenCalledTimes(1);
     });

@@ -7,6 +7,11 @@ import { ApiRespBody } from "./api.response-body";
 export class UserController {
   static async register(req: Request, res: Response<ApiRespBody>) {
     const { username, fullName, email, password, role } = req.body;
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ message: "Username and password are required." });
+    }
     try {
       await UserService.getInstance().createUser({
         username,

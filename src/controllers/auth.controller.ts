@@ -9,7 +9,7 @@ export class AuthController {
       const { username, password } = req.body;
       if (!username || !password) {
         return res
-          .status(500)
+          .status(400)
           .json({ message: "Username and password are required." });
       }
 
@@ -23,7 +23,7 @@ export class AuthController {
           .json({ message: "Invalid username or password." });
       }
 
-      const token = Encrypt.generateToken({ ...user.toDTO() });
+      const token = Encrypt.generateToken(user.toDTO());
 
       return res.status(200).json({ token });
     } catch (error) {
@@ -49,7 +49,7 @@ export class AuthController {
       const user = await UserService.getInstance().getUser({
         where: { id: req["currentUser"].id },
       });
-      return res.status(200).json({ ...user.toDTO() });
+      return res.status(200).json(user.toDTO());
     } catch (error) {
       return res.status(500).json({ message: "Could not retrieve user." });
     }

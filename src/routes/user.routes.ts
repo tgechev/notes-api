@@ -28,12 +28,7 @@ Router.get(
  *     summary: Returns information about a logged in user.
  *     description: Returns information about the logged in user. A valid JWT token is required.
  */
-Router.get(
-  "/",
-  authenticationHandler,
-  authorizationHandler(["user", "admin"]),
-  AuthController.getUser
-);
+Router.get("/", authenticationHandler, AuthController.getUser);
 
 /**
  * @openapi
